@@ -50,3 +50,5 @@ email_setup_guide.md
 email_testing_guide.md
 firebase_deployment_guide.md
 firebase_setup_guide.md
+DEPLOYMENT_CHECKLIST.md
+check-env.ps1
