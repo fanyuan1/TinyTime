@@ -9,12 +9,17 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Loader2, Share2, Check, Calendar, Link as LinkIcon, MapPin, Clock, Pencil, ChevronRight, Mail, AlignLeft } from "lucide-react";
 import { format, addMinutes } from "date-fns";
+import Confirmation from "./Confirmation";
 
 export default function Home() {
+    console.log("Home rendering...");
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const eventId = searchParams.get("eventId");
-    const { state, dispatch } = useEvent();
+    const urlMode = searchParams.get("mode"); // Move to top level
+    const context = useEvent();
+    console.log("EventContext value:", context);
+    const { state, dispatch } = context;
     const [loading, setLoading] = useState(!!eventId);
     const [shareUrl, setShareUrl] = useState("");
     const [copied, setCopied] = useState(false);
@@ -27,11 +32,16 @@ export default function Home() {
                 try {
                     const event = await getEvent(eventId);
                     if (event) {
-                        // Fix: Ensure mode is set correctly based on status
-                        // If status is 'negotiating', it means Host needs to review Proposal (or Guest is waiting).
-                        // If status is 'pending', it means Guest needs to pick time (or Host is waiting).
-                        // But 'view' mode handles both, so we just need to ensure data is loaded.
-                        dispatch({ type: "LOAD_EVENT", payload: { eventData: event, selectedSlots: event.proposedSlots || [], mode: "view" } });
+                        if (urlMode === "edit") {
+                            // Load event in edit mode
+                            dispatch({ type: "LOAD_EVENT", payload: { eventData: event, selectedSlots: event.proposedSlots || [], mode: "edit_event" } });
+                        } else if (event.status === 'confirmed') {
+                            // Check if event is confirmed - if so, render confirmation view
+                            dispatch({ type: "LOAD_EVENT", payload: { eventData: event, selectedSlots: event.proposedSlots || [], mode: "confirmed_view" } });
+                        } else {
+                            // Normal flow for pending/negotiating events
+                            dispatch({ type: "LOAD_EVENT", payload: { eventData: event, selectedSlots: event.proposedSlots || [], mode: "view" } });
+                        }
                     } else {
                         // Handle not found - set mode to create and show error
                         console.error("Event not found:", eventId);
@@ -53,7 +63,7 @@ export default function Home() {
             dispatch({ type: "SET_MODE", payload: "create" });
             setLoading(false);
         }
-    }, [eventId, dispatch]);
+    }, [eventId, urlMode, dispatch]);
 
     const handleCreateEvent = async (formData) => {
         dispatch({ type: "UPDATE_EVENT_DATA", payload: formData });
@@ -130,6 +140,12 @@ export default function Home() {
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             </div>
         );
+    }
+
+    // --- CONFIRMED EVENT VIEW ---
+    // Render the Confirmation component directly when the event is confirmed
+    if (state.mode === "confirmed_view") {
+        return <Confirmation eventData={state.eventData} />;
     }
 
     // --- HOST FLOW: STEP 2 (SELECT TIMES) ---
@@ -438,7 +454,8 @@ export default function Home() {
                                 try {
                                     await updateEventStatus(state.eventData.id, "confirmed", slot, confirmingEmail);
 
-                                    navigate(`/confirmation?eventId=${state.eventData.id}`);
+                                    // Force page reload to fetch updated event data with confirmed status
+                                    window.location.href = `/?eventId=${state.eventData.id}`;
                                 } catch (e) {
                                     console.error(e);
                                     alert(`Error: ${e.message}`);
@@ -686,9 +703,16 @@ export default function Home() {
                                     setLoading(true);
                                     try {
                                         await updateEventDetails(state.eventData.id, data);
-                                        // Update local state and return to view mode
+                                        // Update local state
                                         dispatch({ type: "UPDATE_EVENT_DATA", payload: data });
-                                        dispatch({ type: "SET_MODE", payload: "view" });
+                                        
+                                        // Return to appropriate view based on event status
+                                        if (state.eventData.status === 'confirmed') {
+                                            // Navigate to clean URL without mode parameter
+                                            navigate(`/?eventId=${state.eventData.id}`);
+                                        } else {
+                                            dispatch({ type: "SET_MODE", payload: "view" });
+                                        }
                                     } catch (e) {
                                         console.error(e);
                                         alert("Failed to update event.");
@@ -706,7 +730,15 @@ export default function Home() {
                         {isEditing && (
                             <Button
                                 variant="ghost"
-                                onClick={() => dispatch({ type: "SET_MODE", payload: "view" })}
+                                onClick={() => {
+                                    // Return to appropriate view based on event status
+                                    if (state.eventData.status === 'confirmed') {
+                                        // Navigate to clean URL without mode parameter
+                                        navigate(`/?eventId=${state.eventData.id}`);
+                                    } else {
+                                        dispatch({ type: "SET_MODE", payload: "view" });
+                                    }
+                                }}
                                 className="w-full mt-4"
                             >
                                 Back

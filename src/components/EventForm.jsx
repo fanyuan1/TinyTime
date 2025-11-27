@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Input } from "./ui/Input";
+import { LocationInput } from "./LocationInput";
 import { Button } from "./ui/Button";
 import { Label } from "./ui/Label";
 import { MapPin, Type, AlignLeft, Mail } from "lucide-react";
@@ -16,6 +17,10 @@ export const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleLocationChange = (value) => {
+        setFormData(prev => ({ ...prev, location: value }));
     };
 
     const handleSubmit = (e) => {
@@ -73,13 +78,13 @@ export const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => 
                 <Label htmlFor="location" className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-muted-foreground" /> Location
                 </Label>
-                <Input
+                <LocationInput
                     id="location"
                     name="location"
                     placeholder="Nealon Park"
                     required
                     value={formData.location}
-                    onChange={handleChange}
+                    onChange={handleLocationChange}
                 />
             </div>
 

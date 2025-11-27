@@ -1,33 +1,52 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { getEvent } from "@/lib/db";
 import { downloadICS } from "@/lib/ics";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { CheckCircle, Calendar, MapPin, Clock } from "lucide-react";
+import { CheckCircle, Calendar, MapPin, Clock, Pencil } from "lucide-react";
 import { format, addMinutes } from "date-fns";
 
-export default function Confirmation() {
+export default function Confirmation({ eventData }) {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const eventId = searchParams.get("eventId");
-    const [event, setEvent] = useState(null);
+    const [event, setEvent] = useState(eventData || null);
 
     useEffect(() => {
-        if (eventId) {
+        if (eventData) {
+            setEvent(eventData);
+        } else if (eventId) {
             getEvent(eventId).then(setEvent);
         }
-    }, [eventId]);
+    }, [eventId, eventData]);
 
     const handleDownloadIcs = () => {
         if (event) downloadICS(event);
+    };
+
+    const handleEdit = () => {
+        // Navigate to edit mode with the event ID
+        navigate(`/?eventId=${eventId}&mode=edit`);
     };
 
     if (!event || !event.confirmedSlot) {
         return <div className="text-center p-8">Loading confirmation...</div>;
     }
 
-    const startTime = new Date(event.confirmedSlot.start);
-    const endTime = addMinutes(startTime, event.duration || 30);
+    let startTime, endTime;
+    try {
+        startTime = new Date(event.confirmedSlot.start);
+        if (isNaN(startTime.getTime())) {
+            console.error("Invalid start time:", event.confirmedSlot.start);
+            startTime = new Date(); // Fallback
+        }
+        endTime = addMinutes(startTime, event.duration || 30);
+    } catch (e) {
+        console.error("Error parsing dates:", e);
+        startTime = new Date();
+        endTime = addMinutes(startTime, 30);
+    }
 
     // Format dates for calendar URLs
     const startISO = startTime.toISOString().replace(/-|:|\.\d+/g, "");
@@ -53,10 +72,22 @@ export default function Confirmation() {
         <div className="min-h-screen w-full flex flex-col items-center justify-center">
             <Card className="w-full max-w-3xl mx-auto text-center">
                 <CardHeader>
-                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle className="w-8 h-8 text-green-600" />
+                    <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                                <CheckCircle className="w-8 h-8 text-green-600" />
+                            </div>
+                            <CardTitle className="text-2xl text-green-700">Playdate Confirmed!</CardTitle>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleEdit}
+                            className="shrink-0"
+                        >
+                            <Pencil className="w-4 h-4" />
+                        </Button>
                     </div>
-                    <CardTitle className="text-2xl text-green-700">Playdate Confirmed!</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-2">

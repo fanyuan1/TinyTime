@@ -1,6 +1,6 @@
 # TinyTime - Meeting Scheduler
 
-A modern, lightweight meeting scheduling app built with React and Vite.
+A modern, lightweight meeting scheduling app built with React and Vite. PURE VIBES!
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ Then, run the development server:
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the application by modifying files in the `src/` directory. The page auto-updates as you edit the file.
 

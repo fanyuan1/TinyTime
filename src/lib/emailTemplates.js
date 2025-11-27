@@ -62,7 +62,7 @@ export const getEmailLayout = (content) => {
         .button {
             display: inline-block;
             background: #2563EB;
-            color: #ffffff;
+            color: #ffffff !important;
             text-decoration: none;
             padding: 12px 24px;
             border-radius: 8px;
@@ -71,6 +71,7 @@ export const getEmailLayout = (content) => {
         }
         .button:hover {
             background: #1D4ED8;
+            color: #ffffff !important;
         }
         .info-box {
             background: #F3F4F6;
@@ -257,7 +258,7 @@ export const confirmationTemplate = (event) => {
         <p>Add this event to your calendar:</p>
         
         <div style="text-align: center; margin: 24px 0;">
-            <a href="${typeof window !== 'undefined' ? window.location.origin : ''}/confirmation?eventId=${event.id}" class="button">
+            <a href="${typeof window !== 'undefined' ? window.location.origin : ''}?eventId=${event.id}" class="button">
                 View Confirmation & Add to Calendar
             </a>
         </div>

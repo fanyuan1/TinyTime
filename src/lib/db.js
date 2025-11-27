@@ -138,6 +138,9 @@ export const updateEventDetails = async (eventId, updates) => {
         if (updates.guestEmail !== undefined) updateData.guestEmail = updates.guestEmail;
         if (updates.duration !== undefined) updateData.duration = updates.duration;
 
+        // Explicitly prevent updating confirmedSlot - confirmed times cannot be changed
+        // This ensures event security and prevents accidental modification
+
         await updateDoc(eventRef, updateData);
     } catch (e) {
         console.error("Error updating event details: ", e);

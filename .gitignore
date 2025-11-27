@@ -36,6 +36,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
 # agent-generated instruction files
 implementation_plan.md
 walkthrough.md
