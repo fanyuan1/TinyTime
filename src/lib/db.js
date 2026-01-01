@@ -1,13 +1,14 @@
 import { db } from "./firebase";
 import {
     collection,
-    addDoc,
     doc,
     getDoc,
+    setDoc,
     updateDoc,
     arrayUnion,
     Timestamp
 } from "firebase/firestore";
+import { nanoid } from "nanoid";
 import {
     sendEventCreatedEmail,
     sendProposalNotificationEmail,
@@ -20,7 +21,11 @@ export const createEvent = async (eventData) => {
         const { settings, ...rest } = eventData;
         const duration = eventData.duration || settings?.interval || 30;
 
-        const docRef = await addDoc(collection(db, "events"), {
+        // Generate a short, unique event ID (10 characters)
+        const eventId = nanoid(10);
+        const docRef = doc(db, "events", eventId);
+        
+        await setDoc(docRef, {
             ...rest,
             duration,
             createdAt: Timestamp.now(),
@@ -28,8 +33,6 @@ export const createEvent = async (eventData) => {
             guestEmail: eventData.guestEmail || null, // Ensure guestEmail is set
             confirmedSlot: null
         });
-
-        const eventId = docRef.id;
         const event = { id: eventId, ...rest, duration, guestEmail: eventData.guestEmail || null };
         const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}?eventId=${eventId}`;
 
