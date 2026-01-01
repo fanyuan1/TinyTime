@@ -122,11 +122,15 @@ export const LocationInput = ({ value, onChange, placeholder, ...props }) => {
                 const place = autocompleteRef.current.getPlace();
                 
                 let newValue = "";
-                if (place.formatted_address) {
-                    // Use formatted address if available
+                if (place.name && place.formatted_address) {
+                    // Combine place name with formatted address
+                    // e.g., "Holbrook Park, 225 Park Ln, Atherton, CA 94027, USA"
+                    newValue = `${place.name}, ${place.formatted_address}`;
+                } else if (place.formatted_address) {
+                    // Use formatted address if no name available
                     newValue = place.formatted_address;
                 } else if (place.name) {
-                    // Fallback to place name
+                    // Fallback to place name only
                     newValue = place.name;
                 } else {
                     // If no structured data, get the value directly from the input
