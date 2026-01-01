@@ -185,7 +185,7 @@ export const guestInviteTemplate = (event, shareUrl) => {
  * Template for Scenario C: Host notification when guest proposes new times
  */
 export const hostProposalTemplate = (event) => {
-    const eventUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}?eventId=${event.id}`;
+    const eventUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/?eventId=${event.id}`;
 
     const content = `
         <h1 class="title">💡 New Time Proposal</h1>
@@ -258,7 +258,7 @@ export const confirmationTemplate = (event) => {
         <p>Add this event to your calendar:</p>
         
         <div style="text-align: center; margin: 24px 0;">
-            <a href="${typeof window !== 'undefined' ? window.location.origin : ''}?eventId=${event.id}" class="button">
+            <a href="${typeof window !== 'undefined' ? window.location.origin : ''}/?eventId=${event.id}" class="button">
                 View Confirmation & Add to Calendar
             </a>
         </div>

@@ -86,7 +86,7 @@ export default function Home() {
             console.log("Publishing event:", eventPayload); // Debug log
 
             const newEventId = await createEvent(eventPayload);
-            const url = `${window.location.origin}?eventId=${newEventId}`;
+            const url = `${window.location.origin}/?eventId=${newEventId}`;
             setShareUrl(url);
             dispatch({ type: "SET_MODE", payload: "share" });
         } catch (error) {
@@ -565,7 +565,7 @@ export default function Home() {
     }
 
     if (state.mode === "proposal_sent") {
-        const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}?eventId=${state.eventData.id}` : "";
+        const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/?eventId=${state.eventData.id}` : "";
 
         return (
             <Card className="w-full max-w-3xl mx-auto text-center">

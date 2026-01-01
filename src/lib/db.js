@@ -34,7 +34,7 @@ export const createEvent = async (eventData) => {
             confirmedSlot: null
         });
         const event = { id: eventId, ...rest, duration, guestEmail: eventData.guestEmail || null };
-        const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}?eventId=${eventId}`;
+        const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/?eventId=${eventId}`;
 
         // Scenario A & B: Send email to both host and guest
         await sendEventCreatedEmail(event, shareUrl);
