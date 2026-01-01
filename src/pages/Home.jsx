@@ -98,20 +98,23 @@ export default function Home() {
     };
 
     const handleCopyLink = () => {
+        // Create shareable message with event title
+        const shareMessage = `You're invited to ${state.eventData?.title || 'a playdate'}! View details & RSVP: ${shareUrl}`;
+        
         // Try modern clipboard API first
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(shareUrl)
+            navigator.clipboard.writeText(shareMessage)
                 .then(() => {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                 })
                 .catch(() => {
                     // Fallback
-                    fallbackCopyText(shareUrl);
+                    fallbackCopyText(shareMessage);
                 });
         } else {
             // Fallback
-            fallbackCopyText(shareUrl);
+            fallbackCopyText(shareMessage);
         }
     };
 
@@ -586,6 +589,9 @@ export default function Home() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => {
+                                    // Create shareable message with event title
+                                    const shareMessage = `New time(s) proposed for ${state.eventData?.title || 'your playdate'}! View details & confirm: ${shareUrl}`;
+                                    
                                     // Use robust copy logic
                                     const copyToClipboard = (text) => {
                                         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -618,7 +624,7 @@ export default function Home() {
                                         document.body.removeChild(textArea);
                                     };
 
-                                    copyToClipboard(shareUrl);
+                                    copyToClipboard(shareMessage);
                                 }}
                             >
                                 {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}

@@ -16,21 +16,23 @@ export default function Confirmation({ eventData }) {
 
     const handleShare = () => {
         const eventLink = `${window.location.origin}/?eventId=${eventId}`;
+        // Create shareable message with event title
+        const shareMessage = `${event?.title || 'Your playdate'} has been confirmed! View details & add to your calendar: ${eventLink}`;
         
         // Try modern clipboard API first
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(eventLink)
+            navigator.clipboard.writeText(shareMessage)
                 .then(() => {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                 })
                 .catch(() => {
                     // Fallback
-                    fallbackCopyText(eventLink);
+                    fallbackCopyText(shareMessage);
                 });
         } else {
             // Fallback
-            fallbackCopyText(eventLink);
+            fallbackCopyText(shareMessage);
         }
     };
 
@@ -141,21 +143,21 @@ export default function Confirmation({ eventData }) {
                             </Button>
                         </div>
                         <div className="space-y-2 text-left">
-                            <h3 className="font-semibold text-lg">{event.title}</h3>
-                            <p className="text-gray-600 flex items-center gap-2">
+                            <h3 className="font-semibold">{event.title}</h3>
+                            <p className="text-gray-600 text-sm flex items-center gap-2">
                                 <Calendar className="w-4 h-4 shrink-0" />
                                 {format(startTime, "EEEE, MMMM do, yyyy")}
                             </p>
-                            <p className="text-gray-600 flex items-center gap-2">
+                            <p className="text-gray-600 text-sm flex items-center gap-2">
                                 <Clock className="w-4 h-4 shrink-0" />
                                 {format(startTime, "h:mm a")} - {format(endTime, "h:mm a")}
                             </p>
-                            <p className="text-gray-600 flex items-center gap-2">
+                            <p className="text-gray-600 text-sm flex items-center gap-2">
                                 <MapPin className="w-4 h-4 shrink-0" />
                                 {event.location}
                             </p>
                             {event.description && (
-                                <p className="text-gray-600 flex items-start gap-2">
+                                <p className="text-gray-600 text-sm flex items-start gap-2">
                                     <FileText className="w-4 h-4 shrink-0 mt-0.5" />
                                     {event.description}
                                 </p>
