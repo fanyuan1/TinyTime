@@ -4,7 +4,7 @@ import { getEvent } from "@/lib/db";
 import { downloadICS } from "@/lib/ics";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { CheckCircle, Calendar, MapPin, Clock, Pencil } from "lucide-react";
+import { CheckCircle, Calendar, MapPin, Clock, Pencil, Share2, Check, FileText, CalendarPlus } from "lucide-react";
 import { format, addMinutes } from "date-fns";
 
 export default function Confirmation({ eventData }) {
@@ -12,6 +12,46 @@ export default function Confirmation({ eventData }) {
     const navigate = useNavigate();
     const eventId = searchParams.get("eventId");
     const [event, setEvent] = useState(eventData || null);
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = () => {
+        const eventLink = `${window.location.origin}/?eventId=${eventId}`;
+        
+        // Try modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(eventLink)
+                .then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                })
+                .catch(() => {
+                    // Fallback
+                    fallbackCopyText(eventLink);
+                });
+        } else {
+            // Fallback
+            fallbackCopyText(eventLink);
+        }
+    };
+
+    const fallbackCopyText = (text) => {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+        document.body.removeChild(textArea);
+    };
 
     useEffect(() => {
         if (eventData) {
@@ -72,38 +112,55 @@ export default function Confirmation({ eventData }) {
         <div className="min-h-screen w-full flex flex-col items-center justify-center">
             <Card className="w-full max-w-3xl mx-auto text-center">
                 <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                                <CheckCircle className="w-8 h-8 text-green-600" />
-                            </div>
-                            <CardTitle className="text-2xl text-green-700">Playdate Confirmed!</CardTitle>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleEdit}
-                            className="shrink-0"
-                        >
-                            <Pencil className="w-4 h-4" />
-                        </Button>
+                    <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <CheckCircle className="w-6 h-6 text-green-600" />
                     </div>
+                    <CardTitle className="text-green-700">Playdate Confirmed!</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <h3 className="font-semibold text-lg">{event.title}</h3>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            {format(startTime, "EEEE, MMMM do, yyyy")}
-                        </p>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            {format(startTime, "h:mm a")} - {format(endTime, "h:mm a")}
-                        </p>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <MapPin className="w-4 h-4" />
-                            {event.location}
-                        </p>
+                    {/* Event Details Card */}
+                    <div className="relative bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="absolute top-2 right-2 flex gap-1">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleShare}
+                                className="text-gray-500 hover:text-gray-700"
+                                title="Share event"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Share2 className="w-4 h-4" />}
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleEdit}
+                                className="text-gray-500 hover:text-gray-700"
+                                title="Edit event details"
+                            >
+                                <Pencil className="w-4 h-4" />
+                            </Button>
+                        </div>
+                        <div className="space-y-2 text-left">
+                            <h3 className="font-semibold text-lg">{event.title}</h3>
+                            <p className="text-gray-600 flex items-center gap-2">
+                                <Calendar className="w-4 h-4 shrink-0" />
+                                {format(startTime, "EEEE, MMMM do, yyyy")}
+                            </p>
+                            <p className="text-gray-600 flex items-center gap-2">
+                                <Clock className="w-4 h-4 shrink-0" />
+                                {format(startTime, "h:mm a")} - {format(endTime, "h:mm a")}
+                            </p>
+                            <p className="text-gray-600 flex items-center gap-2">
+                                <MapPin className="w-4 h-4 shrink-0" />
+                                {event.location}
+                            </p>
+                            {event.description && (
+                                <p className="text-gray-600 flex items-start gap-2">
+                                    <FileText className="w-4 h-4 shrink-0 mt-0.5" />
+                                    {event.description}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-3">
@@ -130,8 +187,9 @@ export default function Confirmation({ eventData }) {
                         </Button>
                     </div>
 
-                    <Button variant="outline" onClick={() => window.location.href = '/'} className="w-full mt-4 bg-gray-50 hover:bg-gray-100">
-                        Create Another Event
+                    <Button variant="outline" onClick={() => window.location.href = '/'} className="w-full bg-gray-50 hover:bg-gray-100">
+                        <CalendarPlus className="w-4 h-4 mr-2" />
+                        Create another Event
                     </Button>
                 </CardContent>
             </Card>
