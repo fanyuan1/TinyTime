@@ -1,6 +1,7 @@
 # TinyTime - Meeting Scheduler
 
 A modern, lightweight meeting scheduling app built with React and Vite. PURE VIBES!
+Visit -> tinytime.yingcredible.net
 
 ## Getting Started
 
