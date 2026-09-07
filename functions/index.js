@@ -45,7 +45,7 @@ exports.sendEmail = onRequest({
 
         // Send email using Resend
         const payload = {
-            from: "noreply@notifications.yingcredible.net",
+            from: "noreply@notifications.engsight.app",
             to: Array.isArray(to) ? to : [to],
             subject: subject,
             html: html,

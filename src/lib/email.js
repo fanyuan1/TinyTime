@@ -4,7 +4,7 @@ import {
     confirmationTemplate
 } from './emailTemplates';
 
-const FROM_EMAIL = 'noreply@notifications.yingcredible.net'
+const FROM_EMAIL = 'noreply@notifications.engsight.app'
 
 // Cloud Function endpoint URL - update with your actual project ID after deploying
 // Format: https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/sendEmail
