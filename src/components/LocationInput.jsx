@@ -70,16 +70,18 @@ export const LocationInput = ({ value, onChange, placeholder, ...props }) => {
             return;
         }
 
-        // Load the Google Maps script for the first time
+        // Load the Google Maps script for the first time.
+        // Use loading=async + a global callback, per Google's recommended pattern.
         googleMapsLoadingPromise = new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-            script.async = true;
-            script.defer = true;
-            
-            script.onload = () => {
+            const callbackName = "__initGoogleMapsPlaces";
+            window[callbackName] = () => {
                 resolve();
+                delete window[callbackName];
             };
+
+            const script = document.createElement("script");
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&callback=${callbackName}`;
+            script.async = true;
 
             script.onerror = () => {
                 console.error("Failed to load Google Maps API");
