@@ -19,12 +19,21 @@ export const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => 
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const [locationError, setLocationError] = useState(false);
+
     const handleLocationChange = (value) => {
         setFormData(prev => ({ ...prev, location: value }));
+        if (value) setLocationError(false);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // The Places autocomplete widget isn't a native form control, so
+        // validate the location manually.
+        if (!formData.location.trim()) {
+            setLocationError(true);
+            return;
+        }
         onSubmit(formData);
     };
 
@@ -86,6 +95,9 @@ export const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => 
                     value={formData.location}
                     onChange={handleLocationChange}
                 />
+                {locationError && (
+                    <p className="text-sm text-destructive">Please enter a location.</p>
+                )}
             </div>
 
             <div className="space-y-2">
