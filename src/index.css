@@ -71,29 +71,32 @@
   }
 }
 
-/* Google Places PlaceAutocompleteElement — match the shadcn <Input> look. */
+/* Google Places PlaceAutocompleteElement — match the shadcn <Input> look.
+   The widget adapts to the OS light/dark theme by default and this app is
+   light-only, so pin color-scheme. Border/background/radius are set on the
+   host element (officially supported); the inner input part is made
+   transparent so the whole widget reads as one field. */
 .gmp-autocomplete gmp-place-autocomplete {
   display: block;
   width: 100%;
-}
-
-.gmp-autocomplete gmp-place-autocomplete::part(input) {
-  width: 100%;
-  height: 2.25rem;
-  border-radius: 0.375rem;
+  color-scheme: light;
+  background-color: hsl(var(--background));
   border: 1px solid hsl(var(--input));
-  background-color: transparent;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: hsl(var(--foreground));
+  border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.gmp-autocomplete gmp-place-autocomplete::part(input):focus {
-  outline: none;
+.gmp-autocomplete gmp-place-autocomplete:focus-within {
   border-color: hsl(var(--ring));
   box-shadow: 0 0 0 1px hsl(var(--ring));
+}
+
+.gmp-autocomplete gmp-place-autocomplete::part(input) {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
 }
 
 .diagonal-stripes {
